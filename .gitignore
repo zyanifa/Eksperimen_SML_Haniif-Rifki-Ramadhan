@@ -22,6 +22,3 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
-
-# Data preprocessing hasil (akan di-generate oleh Actions)
-preprocessing/*_preprocessing.csv
