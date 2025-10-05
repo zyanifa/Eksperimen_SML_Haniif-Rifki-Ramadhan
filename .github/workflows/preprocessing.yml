@@ -10,7 +10,7 @@ on:
       - main
     paths:
       - 'Gold Price (2013-2023)_raw.csv'
-      - 'preprocessing/automate_Nama-siswa.py'
+      - 'preprocessing/automate_Haniif-Rifki-Ramadhan.py'
       - '.github/workflows/preprocessing.yml'
   
   # Trigger manual dari GitHub UI
@@ -56,7 +56,7 @@ jobs:
       - name: Run Preprocessing
         run: |
           echo "Starting data preprocessing..."
-          python preprocessing/automate_Nama-siswa.py
+          python preprocessing/automate_Haniif-Rifki-Ramadhan.py
           echo "Preprocessing completed successfully!"
       
       # Step 6: Verify output file
