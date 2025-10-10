@@ -158,12 +158,12 @@ def save_preprocessed_data(df, X_train, y_train, X_test, y_test, scaler, output_
             os.makedirs(output_dir)
             print(f"✓ Folder '{output_dir}' dibuat")
         
-        # Simpan DataFrame yang sudah di-scale (untuk referensi)
+        # Simpan DataFrame yang sudah di-scale
         csv_path = os.path.join(output_dir, 'Gold Price (2013-2023)_preprocessing.csv')
         df.to_csv(csv_path)
         print(f"✓ DataFrame berhasil disimpan ke {csv_path}")
         
-        # Simpan sequences dalam format NPZ (lebih efisien untuk array NumPy)
+        # Simpan sequences dalam format NPZ
         npz_path = os.path.join(output_dir, 'Gold Price (2013-2023)_sequences.npz')
         np.savez(
             npz_path,
