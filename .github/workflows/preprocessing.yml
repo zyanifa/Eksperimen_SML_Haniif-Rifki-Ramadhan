@@ -11,7 +11,7 @@ on:
     branches: [main]
     paths:
       - 'Gold Price (2013-2023)_raw.csv'
-      - 'preprocessing/automate.py'
+      - 'preprocessing/automate_Haniif-Rifki-Ramadhan.py'
       - '.github/workflows/preprocessing.yml'
   workflow_dispatch:
 
@@ -59,7 +59,7 @@ jobs:
       - name: Run Preprocessing
         run: |
           echo "Starting data preprocessing..."
-          python "preprocessing/automate.py"
+          python "preprocessing/automate_Haniif-Rifki-Ramadhan.py"
           echo "Preprocessing completed successfully!"
 
       # 6) Verifikasi seluruh output
