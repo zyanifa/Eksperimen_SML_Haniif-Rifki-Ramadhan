@@ -110,7 +110,7 @@ def create_sequences(df, feature_column='Close_scaled', window_size=60, test_yea
     Membuat sequences untuk LSTM
     Memisahkan train dan test berdasarkan tahun
     """
-    # Pastikan data terurut berdasarkan index (Date)
+    # Memastikan data terurut berdasarkan index tanggal
     df = df.sort_index()
     
     # Ambil data scaled
