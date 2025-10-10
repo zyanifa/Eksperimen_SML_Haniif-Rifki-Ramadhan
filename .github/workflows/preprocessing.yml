@@ -1,112 +1,106 @@
 name: Gold Price Data Preprocessing
 
+# Trigger workflow
 on:
   push:
-    branches: [main]
-    paths:
-      - 'Gold Price (2013-2023)_raw.csv'
-      - 'preprocessing/automate_Haniif-Rifki-Ramadhan.py'
-      - '.github/workflows/preprocessing.yml'
-  pull_request:
-    branches: [main]
+    branches:
+      - main
     paths:
       - 'Gold Price (2013-2023)_raw.csv'
       - 'preprocessing/automate_Haniif-Rifki-Ramadhan.py'
       - '.github/workflows/preprocessing.yml'
   workflow_dispatch:
+  pull_request:
+    branches:
+      - main
 
 jobs:
   preprocess-data:
     name: Run Data Preprocessing
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      actions: read
-
+    
     steps:
-      # 1) Checkout
+      # Step 1: Checkout repository
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
         with:
-          fetch-depth: 0
-
-      # 2) Setup Python
+          fetch-depth: 0  # Fetch all history for all branches
+      
+      # Step 2: Setup Python
       - name: Set up Python 3.12.7
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
           python-version: '3.12.7'
-
-      # 3) (Opsional) Cache pip
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      # 4) Install dependencies
+      
+      # Step 3: Display Python version
+      - name: Display Python Version
+        run: |
+          python --version
+          pip --version
+      
+      # Step 4: Install dependencies
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f "requirements.txt" ]; then
-            pip install -r requirements.txt
-          else
-            pip install pandas numpy scikit-learn
-          fi
-
-      # 5) Jalankan preprocessing
+          pip install -r requirements.txt
+      
+      # Step 5: Run preprocessing script
       - name: Run Preprocessing
         run: |
           echo "Starting data preprocessing..."
-          python "preprocessing/automate_Haniif-Rifki-Ramadhan.py"
+          python preprocessing/automate_Haniif-Rifki-Ramadhan.py
           echo "Preprocessing completed successfully!"
-
-      # 6) Verifikasi seluruh output
-      - name: Verify Preprocessed Outputs
-        shell: bash
+      
+      # Step 6: Verify output file
+      - name: Verify Preprocessed Data
         run: |
-          set -e
-          CSV="preprocessing/Gold Price (2013-2023)_preprocessing.csv"
-          NPZ="preprocessing/Gold Price (2013-2023)_sequences.npz"
-          SCL="preprocessing/scaler.pkl"
+          BASEDIR="preprocessing/Gold Price (2013-2023)_preprocessing"
+          CSV="$BASEDIR/Gold Price (2013-2023)_preprocessing.csv"
+          NPZ="$BASEDIR/Gold Price (2013-2023)_sequences.npz"
+          SCL="$BASEDIR/scaler.pkl"
 
+          missing=0
           for f in "$CSV" "$NPZ" "$SCL"; do
             if [ -f "$f" ]; then
               echo "✓ Found: $f"
               ls -lh "$f"
             else
               echo "✗ ERROR: Missing $f"
-              exit 1
+              missing=1
             fi
           done
 
-          # Informasi cepat baris & ukuran CSV
-          wc -l "$CSV" || true
+          if [ -f "$CSV" ]; then
+            wc -l "$CSV" || true
+          fi
 
-      # 7) Upload sebagai GitHub Artifact
-      - name: Upload Preprocessed Artifacts
+          if [ $missing -ne 0 ]; then
+            exit 1
+          fi
+      
+      # Step 7: Upload preprocessed data as artifact
+      - name: Upload Preprocessed Data
         uses: actions/upload-artifact@v4
         with:
-          name: preprocessed-gold-price-artifacts
+          name: preprocessed-gold-price-data
           path: |
-            preprocessing/Gold Price (2013-2023)_preprocessing.csv
-            preprocessing/Gold Price (2013-2023)_sequences.npz
-            preprocessing/scaler.pkl
-          retention-days: 30
-
-      # 8) Commit & push hasil (CSV, NPZ, scaler)
-      - name: Commit Preprocessed Files
+            preprocessing/Gold Price (2013-2023)_preprocessing/Gold Price (2013-2023)_preprocessing.csv
+            preprocessing/Gold Price (2013-2023)_preprocessing/Gold Price (2013-2023)_sequences.npz
+            preprocessing/Gold Price (2013-2023)_preprocessing/scaler.pkl
+          retention-days: 30  # Simpan artifact selama 30 hari
+      
+      # Step 8: Commit and push hasil preprocessing
+      - name: Commit Preprocessed Data
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add -f "preprocessing/Gold Price (2013-2023)_preprocessing.csv"
-          git add -f "preprocessing/Gold Price (2013-2023)_sequences.npz"
-          git add -f "preprocessing/scaler.pkl"
-          git diff --staged --quiet || git commit -m "Auto-update: Preprocessed artifacts (CSV, NPZ, scaler) [skip ci]"
-        continue-on-error: true
-
+          git add "preprocessing/Gold Price (2013-2023)_preprocessing/Gold Price (2013-2023)_preprocessing.csv"
+          git add "preprocessing/Gold Price (2013-2023)_preprocessing/Gold Price (2013-2023)_sequences.npz"
+          git add "preprocessing/Gold Price (2013-2023)_preprocessing/scaler.pkl"
+          git diff --staged --quiet || git commit -m "Auto-update: Preprocessed data [skip ci]"
+      
       - name: Push Changes
-        run: |
-          git push origin HEAD:main
-        continue-on-error: true
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}

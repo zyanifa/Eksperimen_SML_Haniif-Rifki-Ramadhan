@@ -259,7 +259,7 @@ def preprocess_gold_price_data(input_path, output_dir, window_size=60, test_year
 if __name__ == "__main__":
     import sys
     
-    # Default paths
+    # Mengatur parameter default
     INPUT_FILE = 'Gold Price (2013-2023)_raw.csv'
     OUTPUT_DIR = 'preprocessing/Gold Price (2013-2023)_preprocessing'
     WINDOW_SIZE = 60
